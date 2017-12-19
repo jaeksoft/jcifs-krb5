@@ -107,22 +107,22 @@ public class Kerb5PlatformGssAuthenticator implements SmbExtendedAuthenticator{
 
             byte[] token = new byte[0];
 
-            Kerb5SessionSetupAndX request = null;
+            Kerb5SessionSetupAndX request;
             Kerb5SessionSetupAndXResponse response = null;
 
             while (!spnego.isEstablished()) {
+                assert token != null : "Token is not initialized";
                 token = spnego.initSecContext(token, 0, token.length);
                 if(token != null) {
                     request = new Kerb5SessionSetupAndX(session, null);
                     request.getSecurityBlob().set(token);
                     response = new Kerb5SessionSetupAndXResponse(andxResponse);
 
-                }
-                assert request != null :  "Request is not initialized";
-                session.transport.send(request, response);
-                session.transport.digest = request.digest;
+                    session.transport.send(request, response);
+                    session.transport.digest = request.digest;
 
-                token = response.getSecurityBlob().get();
+                    token = response.getSecurityBlob().get();
+                }
             }
 
             assert response != null :  "Response is not initialized";
