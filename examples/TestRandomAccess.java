@@ -99,7 +99,7 @@ public class TestRandomAccess {
             stf.setLength( newLength );
             System.out.println( "truncated to " + newLength );
         } else if( op == 1 ) {
-            SmbFile file = new SmbFile( argv[0], null, SmbFile.FILE_SHARE_READ );
+            SmbFile file = new SmbFile( argv[0], (NtlmPasswordAuthentication) null, SmbFile.FILE_SHARE_READ );
             stf = new SmbTableFile( file, "rw", 128 );
             stf.insert( r1 );
             System.out.println( "rowid: " + r1.rowid );

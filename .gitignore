@@ -1,3 +1,4 @@
 /.idea
 /jcifs-krb5.iml
 /target
+*.iml
