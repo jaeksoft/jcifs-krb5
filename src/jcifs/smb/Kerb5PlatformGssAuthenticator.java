@@ -1,12 +1,11 @@
 package jcifs.smb;
 
-import java.security.Key;
-
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 
 import jcifs.Config;
+import jcifs.util.LogStream;
 
 /**
  * This class implements SmbExtendedAuthenticator interface to provide Kerberos
@@ -16,6 +15,8 @@ import jcifs.Config;
  *
  */
 public class Kerb5PlatformGssAuthenticator implements SmbExtendedAuthenticator{
+    private static final LogStream LOG = LogStream.getInstance();
+
     /**
      * This variable represents the FLAGS2 field in SMB Header block. The value
      * is predefined to support KerberosV5 authentication. In order to use
@@ -117,11 +118,14 @@ public class Kerb5PlatformGssAuthenticator implements SmbExtendedAuthenticator{
                     response = new Kerb5SessionSetupAndXResponse(andxResponse);
 
                 }
+                assert request != null :  "Request is not initialized";
                 session.transport.send(request, response);
                 session.transport.digest = request.digest;
 
                 token = response.getSecurityBlob().get();
             }
+
+            assert response != null :  "Response is not initialized";
             session.setUid(response.uid);
             session.setSessionSetup(true);
 
@@ -132,7 +136,8 @@ public class Kerb5PlatformGssAuthenticator implements SmbExtendedAuthenticator{
                 try {
                     context.dispose();
                 } catch (GSSException e) {
-
+                    LOG.print("Unable to dispose context cleanly");
+                    e.printStackTrace(LOG);
                 }
             }
         }
@@ -146,12 +151,6 @@ public class Kerb5PlatformGssAuthenticator implements SmbExtendedAuthenticator{
                 userLifetime,
                 contextLifetime
                 );
-//        kerb5Context.getGSSContext().requestAnonymity(false);
-//        kerb5Context.getGSSContext().requestSequenceDet(false);
-//        kerb5Context.getGSSContext().requestMutualAuth(false);
-//        kerb5Context.getGSSContext().requestConf(false);
-//        kerb5Context.getGSSContext().requestInteg(false);
-//        kerb5Context.getGSSContext().requestReplayDet(false);
 
         kerb5Context.getGSSContext().requestMutualAuth(true);
         return kerb5Context;
