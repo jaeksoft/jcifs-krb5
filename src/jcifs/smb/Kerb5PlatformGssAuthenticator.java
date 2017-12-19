@@ -12,9 +12,8 @@ import jcifs.util.LogStream;
  * authentication feature via the Platform GSS.
  * 
  * @author kilokahn
- *
  */
-public class Kerb5PlatformGssAuthenticator implements SmbExtendedAuthenticator{
+public class Kerb5PlatformGssAuthenticator implements SmbExtendedAuthenticator {
     private static final LogStream LOG = LogStream.getInstance();
 
     /**
@@ -142,12 +141,13 @@ public class Kerb5PlatformGssAuthenticator implements SmbExtendedAuthenticator{
             }
         }
     }
+
     private Kerb5Context createContext(String host) throws GSSException{
-        Kerb5Context kerb5Context = 
+        Kerb5Context kerb5Context =
             new Kerb5Context(
                 host, 
                 SERVICE,
-                null,
+                null, // This will delegate the credential fetch to the platform GSS implementation
                 userLifetime,
                 contextLifetime
                 );
@@ -158,9 +158,10 @@ public class Kerb5PlatformGssAuthenticator implements SmbExtendedAuthenticator{
 
     public String getDomain() {
         return getDefaultDomain();
-	}
-	private String getDefaultDomain(){
+    }
+
+    private String getDefaultDomain(){
         return Config.getProperty("jcifs.smb.client.domain", "?");
-	}
+    }
 
 }
